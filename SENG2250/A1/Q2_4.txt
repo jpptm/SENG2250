@@ -23,7 +23,7 @@ c. Suppose that Bob uses a monoalphabetic substitution cipher (regarding the lan
 many ciphertext characters are needed to identify a unique key?  (12 marks)
 
 
----- ---- Q3 ---- ----
+---- ---- Q4 ---- ----
 4. Hash Functions (20 marks)
 
 a. Let ℎ be a secure one-way hash function. Given a set {𝑣1, 𝑣2, 𝑣3, 𝑣4, 𝑣5}, such that 
