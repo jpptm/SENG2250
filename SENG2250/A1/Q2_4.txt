@@ -6,7 +6,10 @@ randomly  selected  from  28  possible  letters.  How  many  different  password
 generated?        (5 marks) 
 
 
-
+- There are 10 spots to fill, and each spot is equally likely to have any letter as repetitions are allowed
+- Each spot has a searching space of 28 characters only as the password is case insensitive
+- This means that each spot has 28 possible choices
+- So the total searching space, i.e., the different passwords that can be generated is 28^10 which is equal to 296 196 766 695 424
 
 
 b. Suppose that an adversary can attempt passwords at a rate of four million per second. 
@@ -14,8 +17,12 @@ If an adversary can immediately know an attempted password’s correctness, what
 the  expected  time (i.e., average time) to  reveal  Alice’s  password  generated  above? 
 Convert the time to the number of seconds.    (8 marks) 
 
-
-
+- The average attempts E(a) is equal to (bestNumberOfAttempts + worstNumberOfAttempts) / 2
+- The best number of attempts would be if the adversary got the password in the first try, i.e., 1 attempt
+- The worst case would be to search through all of the possible passwords in the search space equal to the answer in a)
+- Thus E(a) = (28^10 + 1) / 2 = 148098383347712.5
+- The expected time E(t) will be equal to E(a) / 4e6 , 4e6 being the average number of passwords the adversary can attempt per second
+- The result will be 37024595.83692812 seconds, the average time that will take to reveal Alice's password.
 
 
 c. Suppose that Bob uses a monoalphabetic substitution cipher (regarding the language 
