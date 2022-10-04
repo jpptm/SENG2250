@@ -25,30 +25,30 @@ class Client:
 
         # socket.gethostbyname(socket.gethostname())
         self.server_address = server_address
+        self.id = self.generate_clientID()
 
         self.client.connect((self.server_address, self.port))
 
     def open(self):
-        self.client_send("Client_hello")
-        self.client_send(self.disconnect_message)
+        # Send setup_request hello
+        self.client.send("Client_hello".encode(self.format))
+        print("Client: client_hello")
+        
+        # Receive server hello
+        server_hello = self.client.recv(16).decode(self.format)
+        print(f"Server: {server_hello}")
 
-    # Send msg to server
-    def client_send(self, msg):
+        # Send client ID to server
+        self.client.send(self.id.encode(self.format))
+        print(f"Client: {self.id}")
 
-        message = msg.encode(self.format)
-        msg_length = len(message)
-        send_length = str(msg_length).encode(self.format)
-        send_length += b" " * (self.header - len(send_length))
-        self.client.send(send_length)
-        self.client.send(message)
-
-        print(self.client.recv(2048).decode(self.format))
-        print(self.client.recv(2048).decode(self.format))
-        print(self.client.recv(2048).decode(self.format))
-
-    def receive(self):
-        return
-
+        # Send disconnection message
+        self.client.send(self.disconnect_message.encode(self.format))
+    
+    # TO DO: See pg.py
+    def generate_clientID(self):
+        return secrets.token_urlsafe()
+    
 
 if __name__ == "__main__":
     client = Client(64, 5050, "utf-8", "!DISCONNECT", socket.gethostbyname(socket.gethostname()))

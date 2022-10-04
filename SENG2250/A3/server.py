@@ -1,7 +1,6 @@
 # Server implementation
 import hashlib
 import socket
-import threading
 import time
 import secrets
 
@@ -38,61 +37,50 @@ class Server:
         address = (self.server_address, self.port)
         self.server.bind(address)
 
-    # Handle clients who wish to connect with the server
-    def handle_client(self, connection, address):
-        print(f"[NEW CONNECTION] {address} connected.")
-
-        # Handle the message sent by the client
-        connected = True
-        while connected:
-            msg_length = connection.recv(self.header).decode(self.format)
-            if msg_length:
-                msg_length = int(msg_length)
-                msg = connection.recv(msg_length).decode(self.format)
-                if msg == self.disconnect_message:
-                    connected = False
-
-                # Follow up with sending the RSA public key after client_hello
-                print(f"[{address}] {msg}")
-                connection.send("Msg received".encode(self.format))
-                connection.send("Sending RSA public key...".encode(self.format))
-                connection.send(f"{self.PUBLIC_KEY}".encode(self.format))
-
-        connection.close()
-
-
-    # Open server
-    def open(self):
-        # Listen for connections
-        self.server.listen()
+    # Open server - set max connections by 5 by default
+    def open(self, max_connections=5):
+        # Listen for connections - max 5 for queueing
+        self.server.listen(max_connections)
         print(f"[LISTENING] Server is listening on {self.server_address}")
 
-        # Listen for new possible connections
         while True:
-            # Accept connection from client
-            connection, address = self.server.accept()
+            # Accept connections
+            client_socket, address = self.server.accept()
 
-            # Create thread for the client and start it
-            thread = threading.Thread(target=self.handle_client, args=(connection, address))
-            thread.start()
+            # Receive client_hello
+            client_hello = client_socket.recv(16).decode(self.format)
 
-            # Display number of active connections
-            print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
-
-
+            # Disconnect if the client wishes to do so
+            if client_hello == self.disconnect_message.encode(self.format):
+                break
             
+            # Print client_hello
+            print(f"Client: {client_hello}")            
+            
+            # Send server_hello to client
+            client_socket.send("Server_hello".encode(self.format))
 
+            # Receive client ID
+            clientID = client_socket.recv(16).decode(self.format)
+            print(f"Client: client id {clientID}")
 
-    # Function for sending messages to clients
-    def server_send(self, msg):
-        self.server.send(msg)
+        # Close connection once out of the loop
+        print("Closing connection...")
+        client_socket.close()
+
+    # TO DO See pg.py
+    # Generate serverID
+    def generate_serverID(self):
+        serverID = secrets.token_urlsafe(16)
+        return serverID
+
 
 
 if __name__ == "__main__":
     server = Server(64, 5050, "utf-8", "!DISCONNECT")
     server.open()
 
-
+"cd c:/microsoft vs code/seng2250/seng2250/a3"
 """
 THINGS TO DO
 1 CLIENT SET UP HELLO x
