@@ -14,7 +14,7 @@ class DiffieHellman:
         return fast_mod_exp(y, x, self.p)
 
 
-dhe = DiffieHellman()
+"""dhe = DiffieHellman()
 
 rng = secrets.SystemRandom()
 
@@ -29,6 +29,6 @@ Kba = fast_mod_exp(a_compute, b_choice, dhe.p)
 
 print("Kab = {}".format(Kab))
 print("Kba = {}".format(Kba))
-print(Kab == Kba)
+print(Kab == Kba)"""
 
 # Works

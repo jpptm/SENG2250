@@ -3,7 +3,9 @@ import hashlib
 import secrets
 import socket
 import time
+
 from rsa import RSA
+from dhe import DiffieHellman
 
 # nonce generator is  = secrets.token_urlsafe()
 
@@ -53,27 +55,33 @@ class Server:
             client_setup_request = client_socket.recv(4096).decode(self.format)
 
             # Print client_hello
-            print(f"Client: {client_setup_request}")
+            print(f"Client: {client_setup_request}", "\n")
 
             # Send server_hello to client
             client_socket.send("Server_hello, RSA public key is ".encode(self.format))
             client_socket.send(str(self.rsa.public_key).encode(self.format))
-            print(self.rsa.public_key)
+            print(
+                f"Server: public key sent to client {address}: {self.rsa.public_key}",
+                "\n",
+            )
 
             # Receive client ID and generate session ID
             clientID = client_socket.recv(4096).decode(self.format)
-            print(f"Client: client_hello - {clientID}")
+            print(f"Client: client_hello - {clientID}", "\n")
             sessionID = secrets.token_hex(16)
 
             # The client ID is going to be in hex, now is the time to create the RSA signature using the client ID. Let m = (ServerID, seshID)
             # s = m^d mod n sent by server
             # Server sends (m, s) to client, verifies s^e mod n = m, If true then server is authenticated
-            msg = (clientID, self.id, sessionID)
-            hashed_msg = hashlib.sha256(str(msg).encode()).hexdigest()
+            msg = f"{clientID}/{self.id}/{sessionID}".encode(self.format)
+            hashed_msg = hashlib.sha256(msg).hexdigest()
             hashed_intmsg = int("0x" + hashed_msg, 16)
-            msg_and_signature = (hashed_msg, self.rsa.decrypt(hashed_intmsg))
-            print("Server: msg and signature is ", msg_and_signature)
+            msg_and_signature = (msg, self.rsa.decrypt(hashed_intmsg))
+
+            print("Server: msg and signature is ", msg_and_signature, "\n")
             client_socket.send(str(msg_and_signature).encode(self.format))
+
+            # If the program has not ended by this point then the RSA signature must have matched, now initialise Diffie Hellman
 
             break
 

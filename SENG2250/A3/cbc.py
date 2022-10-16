@@ -79,34 +79,3 @@ def hashed_mac(message, key):
 def bytewiseXOR(a, b):
     # Zip the two byte arrays together, tuple unpack each pair, XOR them and convert back to bytes
     return bytes([x ^ y for x, y in zip(a, b)])
-
-
-def CBCTest():
-    nonce = secrets.token_urlsafe(16)
-
-    print(nonce)
-    print(type(nonce))
-
-    key = 101153146228630395303830694709631737433950628137676538287650741735588006718384388996669347164145838162561867995798027180391347274917152763965286860663592510856353735958012961113658933327330290995775717880049638211397218575432070933547824779245933055388430284894534999613188410321834753695155190531750947931967
-    k_hash = hashlib.sha256(key.to_bytes(1024, "big"))
-    k_ = format(int.from_bytes(k_hash.digest(), "big"), "#0258b")[2:258]
-    k_digest = k_hash.digest()
-
-    message = "this message is somehow crazily enough exactly sixty four bytes."
-    print(message)
-
-    encryptedMessage = cbc_encrypt(message, k_digest, nonce)
-    print(encryptedMessage)
-
-    decryptedMessage = cbc_decrypt(encryptedMessage, k_digest, nonce)
-    print(decryptedMessage)
-
-
-def test():
-    key = 101153146228630395303830694709631737433950628137676538287650741735588006718384388996669347164145838162561867995798027180391347274917152763965286860663592510856353735958012961113658933327330290995775717880049638211397218575432070933547824779245933055388430284894534999613188410321834753695155190531750947931967
-    k_hash = hashlib.sha256(key.to_bytes(1024, "big"))
-    k_digest = k_hash.digest()
-    message = "ahis message is somehow crazily enough exactly sixty four bytes."
-
-    print("message:", message)
-    print("hmac:\t", hashed_mac(message, k_digest))

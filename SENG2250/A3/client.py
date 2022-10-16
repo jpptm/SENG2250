@@ -1,6 +1,10 @@
 import secrets
 import socket
+import sys
+
 import util
+
+import hashlib
 
 
 class Client:
@@ -28,47 +32,47 @@ class Client:
 
         # Send setup_request hello
         self.client.send("Client_setup_request".encode(self.format))
-        print("Client: Client_setup_request")
+        print("Client: Client_setup_request", "\n")
 
         # Receive server hello
         server_hello = self.client.recv(4096).decode(self.format)
         rsa_strpubkey = self.client.recv(4096).decode(self.format)
 
-        print(type(rsa_strpubkey))
-        print(f"Server: {server_hello}")
+        print(f"Server: {server_hello}", "\n")
 
-        # Decode the public key from the server - take ( and ) out of the string then split by ,
-        # Entry 0 is e, entry 1 is n
+        # Decode the public key from the server then split by comma. Entry 0 is e, entry 1 is n
+        # the [1:] takes the unnecessary space char away from n
         rsa_pubkey_tuple = [e for e in rsa_strpubkey[1:-1].split(",")]
         e, n = int(rsa_pubkey_tuple[0]), int(rsa_pubkey_tuple[1][1:])
-        print(f"Server public key: {rsa_pubkey_tuple}")
-        # print("".join(str(e) for e in rsa_pubkey_tuple))
+        print(f"Server public key: {rsa_pubkey_tuple}", "\n")
 
         # Send client ID to server
         self.client.send(self.id.encode(self.format))
-        print(f"Client: client_hello - {self.id}")
+        print(f"Client: client_hello - {self.id}", "\n")
 
         # Receive RSA signature from server
         server_rsa_msgsig = self.client.recv(4096).decode(self.format)
 
-        print(f"Server: msg and signature is {server_rsa_msgsig}")
-
         # Verify the signature by transforming the msg back to tuple form and doing the maths
         msg, signature = (e for e in server_rsa_msgsig[1:-1].split(","))
-        # Remove space char in the beginning of signature and ' in the start and end of msg
-        msg = msg[1:-1]
+        # Remove space char in the beginning of signature and b'' in msg
+        msg = msg[2:-1]
         signature = signature[1:]
-        # print(f"msg: {msg}, signature: {signature}")
-        # print("typecast: ", type(signature))
-        # Type cast twice and derive signature
+
+        # Derive the signature by doing the maths and compare to the hash of the raw msg
         sig_to_msg = util.fast_mod_exp(int(signature), e, n)
+        hashed_rawmsg = hashlib.sha256(msg.encode()).hexdigest()
         hexmsg = sig_to_msg.to_bytes((sig_to_msg.bit_length() + 7) // 8, "big").hex()
-        print("Signature to msg: ", hexmsg)
-        print("msg to siggggggg: ", msg)
-        print(type(hexmsg))
-        print(type(msg))
-        if msg == hexmsg:
-            print("Signature verified")
+
+        # Confirm signature integrity
+        if hashed_rawmsg == hexmsg:
+            print("Signature verified", "\n")
+        # Force close connection if the RSA signature is not the same as the msg
+        else:
+            print("Signature not verified, connection not secure", "\n")
+            sys.exit()
+
+        # Initialise Diffie-Hellman key exchange if the signatures match
         # Send disconnection message
         self.client.send(self.disconnect_message.encode(self.format))
 
