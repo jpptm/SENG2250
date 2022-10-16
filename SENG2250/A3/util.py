@@ -93,9 +93,9 @@ def egcd(a: int, b: int) -> tuple:
         return b, 0, 1
     else:
         g, y, x = egcd(b % a, a)
-        return g, x - (b // a) * y
+        return g, x - (b // a) * y, y
 
 
 def find_mod_inv(a: int, m: int):
-    g, x = egcd(a, m)
+    g, x, y = egcd(a, m)
     return "The modular inverse of a and m is non existent" if g != 1 else x % m

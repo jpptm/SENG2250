@@ -3,6 +3,7 @@ import hashlib
 import secrets
 import socket
 import time
+from rsa import RSA
 
 # nonce generator is  = secrets.token_urlsafe()
 
@@ -15,6 +16,8 @@ class Server:
         port: int,
         format: str,
         disconnect_message: str,
+        rsa: RSA,
+        id=secrets.token_hex(16),
     ):
         # Length of msg in bytes
         self.header = header
@@ -28,7 +31,10 @@ class Server:
         self.server_address = socket.gethostbyname(socket.gethostname())
         # Socket object
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+        # RSA object
+        self.rsa = rsa
+        # Server ID
+        self.id = id
         # Bind server to chosen address
         address = (self.server_address, self.port)
         self.server.bind(address)
@@ -44,21 +50,32 @@ class Server:
             client_socket, address = self.server.accept()
 
             # Receive client_hello
-            client_hello = client_socket.recv(16).decode(self.format)
-
-            # Disconnect if the client wishes to do so
-            if client_hello == self.disconnect_message.encode(self.format):
-                break
+            client_setup_request = client_socket.recv(4096).decode(self.format)
 
             # Print client_hello
-            print(f"Client: {client_hello}")
+            print(f"Client: {client_setup_request}")
 
             # Send server_hello to client
-            client_socket.send("Server_hello".encode(self.format))
+            client_socket.send("Server_hello, RSA public key is ".encode(self.format))
+            client_socket.send(str(self.rsa.public_key).encode(self.format))
+            print(self.rsa.public_key)
 
-            # Receive client ID
-            clientID = client_socket.recv(16).decode(self.format)
-            print(f"Client: client id {clientID}")
+            # Receive client ID and generate session ID
+            clientID = client_socket.recv(4096).decode(self.format)
+            print(f"Client: client_hello - {clientID}")
+            sessionID = secrets.token_hex(16)
+
+            # The client ID is going to be in hex, now is the time to create the RSA signature using the client ID. Let m = (ServerID, seshID)
+            # s = m^d mod n sent by server
+            # Server sends (m, s) to client, verifies s^e mod n = m, If true then server is authenticated
+            msg = (clientID, self.id, sessionID)
+            hashed_msg = hashlib.sha256(str(msg).encode()).hexdigest()
+            hashed_intmsg = int("0x" + hashed_msg, 16)
+            msg_and_signature = (hashed_msg, self.rsa.decrypt(hashed_intmsg))
+            print("Server: msg and signature is ", msg_and_signature)
+            client_socket.send(str(msg_and_signature).encode(self.format))
+
+            break
 
         # Close connection once out of the loop
         print("Closing connection...")
@@ -66,33 +83,7 @@ class Server:
 
 
 if __name__ == "__main__":
-    server = Server(64, 5050, "utf-8", "!DISCONNECT")
+    server = Server(64, 5050, "utf-8", "!DISCONNECT", RSA())
     server.open()
 
 "cd c:/microsoft vs code/seng2250/seng2250/a3"
-"""
-THINGS TO DO
-1 CLIENT SET UP HELLO x
-2 SERVER SEND CLIENT RSA PUB KEY
-3 CLIENT HELLO: ID_CLIENT
-4 SERVER HELLO: ID_SERVER, SESSION_ID
-5 EPHEMERAL DHE
-6 CHECK SHARED KEY
-7 DATA EXCHANGE
-8 DISCONNECT
-"""
-
-"""
-FAST MODULAR EXPONENTIATION
-# Used to calculate for keys in DHE and RSA
-def fme(base, exponent, n):
-    if n == 1:
-        return 0
-    rs = 1
-    while exponent > 0:
-        if exponent & 1 == 1:
-            rs = (rs * base) % n
-        exponent = exponent >> 1
-        base = (base * base) % n
-    return rs
-"""
