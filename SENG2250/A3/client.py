@@ -73,6 +73,7 @@ class Client:
             sys.exit()
 
         # Initialise Diffie-Hellman key exchange if the signatures match
+
         # Send disconnection message
         self.client.send(self.disconnect_message.encode(self.format))
 
