@@ -1,9 +1,10 @@
 from util import *
 
+
 # This script will handle message encryption and decryption using RSA
 class RSA:
     def __init__(self):
-        
+
         # Generate rsa keys by using functions from the util module
         # Flag p and q as private members. They must not be touched from outside the class
         p = generate_prime(1024)
@@ -28,8 +29,7 @@ class RSA:
 
     # Functions for encrypting and decrypting a msg
     def encrypt(self, msg):
-        return fast_mod(msg, self.e, self.n)
+        return fast_mod_exp(msg, self.e, self.n)
 
     def decrypt(self, msg):
-        return fast_mod(msg, self.__private_key[2], self.n)
-        
+        return fast_mod_exp(msg, self.__private_key[2], self.n)

@@ -8,7 +8,7 @@ from random import randrange, getrandbits
 # import Crypto.Util.number as number
 
 # Function for fast modular exponentiation
-def fast_mod(base, exponent, n):
+def fast_mod_exp(base, exponent, n):
     # If we mod by 1 the remainder is always 0 so return 0 if n is 1
     if n == 1:
         return 0
@@ -17,7 +17,7 @@ def fast_mod(base, exponent, n):
     while exponent > 0:
         if exponent & 1 == 1:
             rs = (rs * base) % n
-        
+
         # Shift bits to the right by 1 until we reach 0
         exponent = exponent >> 1
         base = (base * base) % n
@@ -25,7 +25,7 @@ def fast_mod(base, exponent, n):
 
 
 # The following functions will be used to generate prime numbers for RSA
-def is_prime(n:int, k=128) -> bool:
+def is_prime(n: int, k=128) -> bool:
     # Easy primes: 2, 3
     # All even numbers are not primes so we take care of them right away
     # Also get rid of negative numbers
@@ -40,7 +40,7 @@ def is_prime(n:int, k=128) -> bool:
     while r & 1 == 0:
         s += 1
         r //= 2
-    
+
     # Test k times
     for _ in range(k):
         a = randrange(2, n - 1)
@@ -68,17 +68,18 @@ def generate_prime_candidate(length: int) -> int:
 
     # LSR right by length - 1 times and or it with 1 to make sure the number is odd
     tempo = (1 << length - 1) | 1
-    
+
     # Apply a mask to set MSB and LSB to 1
     p = p | tempo
 
-    #p |= (1 << length - 1) | 1
+    # p |= (1 << length - 1) | 1
     # p = p | (1 << length-1) | 1
 
     return p | tempo
 
+
 # Keep generating prime candidates until it passes the is_prime() test
-def generate_prime(length=1024)->int:
+def generate_prime(length=1024) -> int:
     p = 4
     while is_prime(p, 128) is False:
         p = generate_prime_candidate(length)
@@ -87,7 +88,7 @@ def generate_prime(length=1024)->int:
 
 
 # Functions for checking and finding modular inverses
-def egcd(a:int, b:int) -> tuple:
+def egcd(a: int, b: int) -> tuple:
     if a == 0:
         return b, 0, 1
     else:
@@ -95,7 +96,6 @@ def egcd(a:int, b:int) -> tuple:
         return g, x - (b // a) * y
 
 
-def find_mod_inv(a:int, m:int):
+def find_mod_inv(a: int, m: int):
     g, x = egcd(a, m)
     return "The modular inverse of a and m is non existent" if g != 1 else x % m
-
