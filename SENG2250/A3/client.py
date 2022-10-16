@@ -1,10 +1,10 @@
+import hashlib
 import secrets
 import socket
 import sys
 
 import util
-
-import hashlib
+from dhe import DiffieHellman
 
 
 class Client:
@@ -22,7 +22,6 @@ class Client:
         self.format = format
         self.disconnect_message = disconnect_message
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # socket.gethostbyname(socket.gethostname())
         self.server_address = server_address
         self.id = id
 
@@ -73,6 +72,22 @@ class Client:
             sys.exit()
 
         # Initialise Diffie-Hellman key exchange if the signatures match
+
+        # === === === D I F F I E - H E L L M A N - E X C H A N G E === === === #
+
+        # Generate a random number and initiate DHKE (1 < xa < p)
+        dh = DiffieHellman()
+        true_rng = secrets.SystemRandom()
+        xb = true_rng.randint(2, dh.p - 1)
+
+        # Receive server public key and generate client's public key
+        yb = dh.calculate_pubkey(xb)
+        xa = self.client.recv(4096).decode(self.format)
+        self.client.send(str(xb).encode(self.format))
+
+        # Calculate shared secret key
+        Kab = dh.calculate_shared_secret(yb, int(xa))
+        print(f"Shared secret key: {Kab}", "\n")
 
         # Send disconnection message
         self.client.send(self.disconnect_message.encode(self.format))

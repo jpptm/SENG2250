@@ -33,8 +33,3 @@ class RSA:
 
     def decrypt(self, msg):
         return fast_mod_exp(msg, self.__private_key[2], self.n)
-
-    """# Takse an int input to compute a signature
-    def sign(self, msg):
-        return fast_mod_exp(msg, self.__private_key[2], self.n)
-"""

@@ -83,6 +83,21 @@ class Server:
 
             # If the program has not ended by this point then the RSA signature must have matched, now initialise Diffie Hellman
 
+            # === === === D I F F I E - H E L L M A N - E X C H A N G E === === === #
+
+            # Generate a random number and initiate DHKE (1 < xa < p)
+            dh = DiffieHellman()
+            true_rng = secrets.SystemRandom()
+            xa = true_rng.randint(2, dh.p - 1)
+
+            # Generate server's public key and send it to the client
+            ya = dh.calculate_pubkey(xa)
+            client_socket.send(str(xa).encode(self.format))
+            xb = client_socket.recv(4096).decode(self.format)
+
+            # Calculate the shared secret key
+            Kba = dh.calculate_shared_secret(ya, int(xb))
+            print("Server: shared secret key is ", Kba, "\n")
             break
 
         # Close connection once out of the loop
