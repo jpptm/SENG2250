@@ -2,10 +2,10 @@
 import hashlib
 import secrets
 import socket
-import time
 
-from rsa import RSA
+import cbc
 from dhe import DiffieHellman
+from rsa import RSA
 
 # nonce generator is  = secrets.token_urlsafe()
 
@@ -97,7 +97,61 @@ class Server:
 
             # Calculate the shared secret key
             Kba = dh.calculate_shared_secret(ya, int(xb))
-            print("Server: shared secret key is ", Kba, "\n")
+            # print("Server: shared secret key is ", Kba, "\n")
+
+            # === === === C B C - H M A C - T E S T === === === #
+
+            # 64 byte (64 chars) msg from server to be delivered to client
+            server_msg = (
+                "Man cannot grow without pain for man is both sculptor and marble"
+            )
+            # Generate HMAC using the Diffie-Hellman key for this session
+            k_prime = hashlib.sha256(Kba.to_bytes(1024, "big")).digest()
+            server_hmac = cbc.hashed_mac(server_msg, k_prime)
+            # Cbc encrypt the msg
+            encrypted_server_msg = cbc.encrypt(server_msg, k_prime, sessionID)
+
+            print(
+                f"Server: plaintext - {server_msg}, encrypted - {encrypted_server_msg}, hmac - {server_hmac}",
+                "\n",
+            )
+            print(f"Server: Kprime: {k_prime}, sesionID: {sessionID}")
+
+            # Receive and send needed messages
+            server_pack = (encrypted_server_msg, server_hmac)
+            client_socket.send(str(server_pack).encode(self.format))
+            client_pack = client_socket.recv(4096).decode(self.format)
+
+            # Parse data received from client
+            client_pack = client_pack[1:-1].split(",")
+            encrypted_client_msg = client_pack[0]
+            # The [1:-1] is to remove the quotes from the string
+            encrypted_client_msg = encrypted_client_msg[1:-1]
+            client_hmac = client_pack[1][1:]
+            client_hmac = client_hmac[1:-1]
+
+            print(encrypted_client_msg)
+            print(client_hmac)
+
+            # Derive client hmac by decrypting client message - if the hmacs match then the message is authentic
+            server_derived_client_plaintext = cbc.decrypt(
+                encrypted_client_msg, k_prime, sessionID
+            )
+            server_derived_client_hmac = cbc.hashed_mac(
+                server_derived_client_plaintext, k_prime
+            )
+
+            print(
+                f"Server: derived plaintext - {server_derived_client_plaintext}, derived hmac - {server_derived_client_hmac}",
+                "\n",
+            )
+
+            # If the hmacs match then the message is authentic
+            if server_derived_client_hmac == client_hmac:
+                print("Server: client message is authentic")
+            else:
+                print("Server: client message is not authentic")
+
             break
 
         # Close connection once out of the loop

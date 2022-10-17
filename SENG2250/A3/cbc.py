@@ -3,7 +3,7 @@ from Crypto.Cipher import AES
 import secrets
 
 
-def cbc_encrypt(plaintext, key, nonce):
+def encrypt(plaintext, key, nonce):
     # Initialise encryption object and turn nonce to 16 bytes. nonce will initially be secrets.token_urlsafe(16) (str) and will be converted to bytes
     ciphertext = []
     aes = AES.new(key, AES.MODE_ECB)
@@ -30,7 +30,7 @@ def cbc_encrypt(plaintext, key, nonce):
     return "".join([c for c in ciphertext])
 
 
-def cbc_decrypt(ciphertext, key, nonce):
+def decrypt(ciphertext, key, nonce):
     # Initialise decryption object and turn nonce to 16 bytes. nonce will initially be secrets.token_urlsafe(16) (str) and will be converted to bytes
     plaintext = []
     aes = AES.new(key, AES.MODE_ECB)
