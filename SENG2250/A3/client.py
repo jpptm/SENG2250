@@ -134,7 +134,7 @@ class Client:
         )
 
         print(
-            f"Client: derived plaintext - {client_derived_server_plaintext}, derived hmac - {client_derived_server_hmac}",
+            f"Client: derived server plaintext - {client_derived_server_plaintext}, derived server hmac - {client_derived_server_hmac}",
             "\n",
         )
 

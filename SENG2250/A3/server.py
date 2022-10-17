@@ -142,15 +142,15 @@ class Server:
             )
 
             print(
-                f"Server: derived plaintext - {server_derived_client_plaintext}, derived hmac - {server_derived_client_hmac}",
+                f"Server: derived client plaintext - {server_derived_client_plaintext}, derived client hmac - {server_derived_client_hmac}",
                 "\n",
             )
 
             # If the hmacs match then the message is authentic
             if server_derived_client_hmac == client_hmac:
-                print("Server: client message is authentic")
+                print("Server: Client message is authentic")
             else:
-                print("Server: client message is not authentic")
+                print("Server: Client message is not authentic")
 
             break
 
