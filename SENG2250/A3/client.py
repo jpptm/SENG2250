@@ -100,7 +100,12 @@ class Client:
         sessionID = msg.split("/")[2]
         # Use the hashed Diffie-Hellman key as k' and generate hmac
         k_prime = hashlib.sha256(Kab.to_bytes(1024, "big")).digest()
+
+        # Trim the key down to 192 bits for a 192 bit AES CBC key
+        k_prime = k_prime[:24]
+        print("k_prime_len: ", len(k_prime))
         client_hmac = cbc.hashed_mac(client_message, k_prime)
+
         # Cbc encrypt client msg
         encrypted_client_msg = cbc.encrypt(client_message, k_prime, sessionID)
 

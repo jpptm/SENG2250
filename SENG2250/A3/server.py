@@ -107,7 +107,12 @@ class Server:
             )
             # Generate HMAC using the Diffie-Hellman key for this session
             k_prime = hashlib.sha256(Kba.to_bytes(1024, "big")).digest()
+
+            # Trim the key down to 192 bits for a 192 bit AES CBC key
+            k_prime = k_prime[:24]
+            print("k_prime_len: ", len(k_prime))
             server_hmac = cbc.hashed_mac(server_msg, k_prime)
+
             # Cbc encrypt the msg
             encrypted_server_msg = cbc.encrypt(server_msg, k_prime, sessionID)
 
