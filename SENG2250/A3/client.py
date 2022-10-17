@@ -93,7 +93,9 @@ class Client:
         # === === === C B C - H M A C - T E S T === === === #
 
         # 64 byte (64 chars) msg from client to be delivered to server
-        client_message = "Some things, only when broken are truly complete"
+        client_message = (
+            "Some things must first be broken, before they are truly complete"
+        )
         # Use session ID as nonce
         sessionID = msg.split("/")[2]
         # Use the hashed Diffie-Hellman key as k' and generate hmac
