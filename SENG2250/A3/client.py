@@ -92,6 +92,7 @@ class Client:
 
         # === === === C B C - H M A C - T E S T === === === #
 
+        print("F I R S T - M E S S A G E - E X C H A N G E")
         # 64 byte (64 chars) msg from client to be delivered to server
         client_message = (
             "Some things must first be broken, before they are truly complete"
@@ -110,10 +111,18 @@ class Client:
         encrypted_client_msg = cbc.encrypt(client_message, k_prime, sessionID)
 
         print(
-            f"Client: plaintext -{client_message}, encrypted-{encrypted_client_msg}, hmac-{client_hmac}",
+            f"""Client: 
+                      Plaintext: {client_message}
+                      Encrypted: {encrypted_client_msg}
+                           Hmac: {client_hmac}""",
             "\n",
         )
-        print(f"Client: kprime: {k_prime }, sessionID: {sessionID}", "\n")
+        print(
+            f"""Client: 
+                         Kprime: {k_prime }
+                      SessionID: {sessionID}""",
+            "\n",
+        )
         # Receive cbc encrypted msg from server
 
         # Receive and send needed messages
@@ -129,7 +138,11 @@ class Client:
         server_hmac = server_pack[1][1:]
         server_hmac = server_hmac[1:-1]
 
-        print(encrypted_server_msg)
+        print(
+            f"""Client: 
+                        Encrypted server message: {encrypted_server_msg}
+                                     Server hmac: {server_hmac}"""
+        )
         print(server_hmac)
 
         # Derive server hmac by decrypting server msg - if the hmacs match then the message is authentic
@@ -141,7 +154,9 @@ class Client:
         )
 
         print(
-            f"Client: derived server plaintext - {client_derived_server_plaintext}, derived server hmac - {client_derived_server_hmac}",
+            f"""Client: 
+                      Derived server plaintext: {client_derived_server_plaintext} 
+                           Derived server hmac: {client_derived_server_hmac}""",
             "\n",
         )
 
@@ -149,6 +164,81 @@ class Client:
             print("Client: Server message is authentic", "\n")
         else:
             print("Client: Server message is not authentic", "\n")
+            sys.exit()
+
+        print("S E C O N D - M E S S A G E - E X C H A N G E")
+
+        client_message = (
+            "Ran out of quotes so here's a boring 64 byte msg from the client"
+        )
+        # Use session ID as nonce
+        sessionID = msg.split("/")[2]
+        # Use the hashed Diffie-Hellman key as k' and generate hmac
+        k_prime = hashlib.sha256(Kab.to_bytes(1024, "big")).digest()
+
+        # Trim the key down to 192 bits for a 192 bit AES CBC key
+        k_prime = k_prime[:24]
+        print("k_prime_len: ", len(k_prime))
+        client_hmac = cbc.hashed_mac(client_message, k_prime)
+
+        # Cbc encrypt client msg
+        encrypted_client_msg = cbc.encrypt(client_message, k_prime, sessionID)
+
+        print(
+            f"""Client: 
+                      Plaintext: {client_message}
+                      Encrypted: {encrypted_client_msg}
+                           Hmac: {client_hmac}""",
+            "\n",
+        )
+        print(
+            f"""Client: 
+                         Kprime: {k_prime }
+                      SessionID: {sessionID}""",
+            "\n",
+        )
+        # Receive cbc encrypted msg from server
+
+        # Receive and send needed messages
+        server_pack = self.client.recv(4096).decode(self.format)
+        client_pack = (encrypted_client_msg, client_hmac)
+        self.client.send(str(client_pack).encode(self.format))
+
+        # Parse data received from server
+        server_pack = server_pack[1:-1].split(",")
+        encrypted_server_msg = server_pack[0]
+        # The [1:-1] is to remove the quotes from the string
+        encrypted_server_msg = encrypted_server_msg[1:-1]
+        server_hmac = server_pack[1][1:]
+        server_hmac = server_hmac[1:-1]
+
+        print(
+            f"""Client: 
+                        Encrypted server message: {encrypted_server_msg}
+                                     Server hmac: {server_hmac}"""
+        )
+        print(server_hmac)
+
+        # Derive server hmac by decrypting server msg - if the hmacs match then the message is authentic
+        client_derived_server_plaintext = cbc.decrypt(
+            encrypted_server_msg, k_prime, sessionID
+        )
+        client_derived_server_hmac = cbc.hashed_mac(
+            client_derived_server_plaintext, k_prime
+        )
+
+        print(
+            f"""Client: 
+                      Derived server plaintext: {client_derived_server_plaintext} 
+                           Derived server hmac: {client_derived_server_hmac}""",
+            "\n",
+        )
+
+        if client_derived_server_hmac == server_hmac:
+            print("Client: Server message is authentic", "\n")
+        else:
+            print("Client: Server message is not authentic", "\n")
+            sys.exit()
 
         # Send disconnection message
         self.client.send(self.disconnect_message.encode(self.format))
