@@ -8,8 +8,10 @@ Dependencies required:
     socket
     secrets
     sys
+    pycryptodome
+    random
 
-As far as I am aware these libraries are all built in but if the interpreter throws an unknown module error, please try
+As far as I am aware these libraries are all built in (except for pycryptodome) but if the interpreter throws an unknown module error, please try
 
     'pip install <library_name>'
 

@@ -1,5 +1,4 @@
 from util import fast_mod_exp
-import secrets
 
 
 class DiffieHellman:
@@ -14,7 +13,9 @@ class DiffieHellman:
         return fast_mod_exp(y, x, self.p)
 
 
-"""dhe = DiffieHellman()
+"""
+# Simulate DHKE
+dhe = DiffieHellman()
 
 rng = secrets.SystemRandom()
 
@@ -29,6 +30,7 @@ Kba = fast_mod_exp(a_compute, b_choice, dhe.p)
 
 print("Kab = {}".format(Kab))
 print("Kba = {}".format(Kba))
-print(Kab == Kba)"""
+print(Kab == Kba)
+"""
 
 # Works

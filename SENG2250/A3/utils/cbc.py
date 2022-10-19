@@ -1,6 +1,5 @@
 import hashlib
 from Crypto.Cipher import AES
-import secrets
 
 
 def encrypt(plaintext, key, nonce):
