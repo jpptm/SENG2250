@@ -3,11 +3,11 @@ import hashlib
 import secrets
 import socket
 
-import cbc
-from dhe import DiffieHellman
-from rsa import RSA
+from utils import cbc
+from utils.dhe import DiffieHellman
+from utils.rsa import RSA
 
-# nonce generator is  = secrets.token_urlsafe()
+# nonce / ID generator is  = secrets.token_hex()
 
 
 class Server:

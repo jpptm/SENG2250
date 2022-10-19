@@ -3,9 +3,8 @@ import secrets
 import socket
 import sys
 
-import cbc
-import util
-from dhe import DiffieHellman
+from utils import cbc, util
+from utils.dhe import DiffieHellman
 
 
 class Client:
