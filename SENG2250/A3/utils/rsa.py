@@ -1,4 +1,4 @@
-from util import *
+from .util import *
 
 
 # This script will handle message encryption and decryption using RSA

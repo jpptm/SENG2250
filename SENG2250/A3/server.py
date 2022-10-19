@@ -16,7 +16,6 @@ class Server:
         self,
         port: int,
         format: str,
-        disconnect_message: str,
         rsa: RSA,
         id=secrets.token_hex(16),
     ):
@@ -137,17 +136,17 @@ class Server:
 
         print(
             f"""Server: 
-                        Plaintext: {server_msg},
-                        Encrypted: {encrypted_server_msg},
-                            Hmac: {server_hmac}""",
+                        Plaintext: {server_msg}
+                        Encrypted: {encrypted_server_msg}
+                             Hmac: {server_hmac}""",
             "\n",
         )
 
         print(
             f"""Server: 
-                        Kprime: {k_prime}, 
                         sesionID: {sessionID}"""
         )
+        # f"Kprime: {k_prime}"
 
         # Receive and send needed messages
         server_pack = (encrypted_server_msg, server_hmac)
@@ -192,5 +191,5 @@ class Server:
 
 
 if __name__ == "__main__":
-    server = Server(64, 5050, "utf-8", "!DISCONNECT", RSA())
+    server = Server(5050, "utf-8", RSA())
     server.open()

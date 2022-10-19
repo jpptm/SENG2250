@@ -47,6 +47,7 @@ class Client:
 
         # Receive RSA signature from server
         server_rsa_msgsig = self.client.recv(4096).decode(self.format)
+        print("Server: msg and signature is ", server_rsa_msgsig, "\n")
 
         # Verify the signature by transforming the msg back to tuple form and doing the maths
         msg, signature = (e for e in server_rsa_msgsig[1:-1].split(","))
@@ -83,7 +84,7 @@ class Client:
 
         # Calculate shared secret key
         Kab = dh.calculate_shared_secret(yb, int(xa))
-        print(f"Shared secret key: {Kab}", "\n")
+        # print(f"Shared secret key: {Kab}", "\n") # Uncomment if the user wishes to see the shared secret key
 
         # === === === C B C - H M A C - T E S T === === === #
 
@@ -133,11 +134,10 @@ class Client:
         )
         print(
             f"""Client: 
-                         Kprime: {k_prime }
                       SessionID: {sessionID}""",
             "\n",
         )
-        # Receive cbc encrypted msg from server
+        # f"Kprime: {k_prime }"
 
         # Receive and send needed messages
         server_pack = self.client.recv(4096).decode(self.format)
@@ -183,7 +183,5 @@ class Client:
 
 
 if __name__ == "__main__":
-    client = Client(
-        64, 5050, "utf-8", "!DISCONNECT", socket.gethostbyname(socket.gethostname())
-    )
+    client = Client(5050, "utf-8", socket.gethostbyname(socket.gethostname()))
     client.open()

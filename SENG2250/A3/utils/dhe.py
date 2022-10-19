@@ -1,4 +1,4 @@
-from util import fast_mod_exp
+from .util import fast_mod_exp
 
 
 class DiffieHellman:
