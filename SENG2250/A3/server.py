@@ -14,21 +14,16 @@ class Server:
     # Constructor for server object
     def __init__(
         self,
-        header: int,
         port: int,
         format: str,
         disconnect_message: str,
         rsa: RSA,
         id=secrets.token_hex(16),
     ):
-        # Length of msg in bytes
-        self.header = header
         # Port for server and client to communicate on
         self.port = port
         # Format of msg
         self.format = format
-        # Msg to disconnect from channel
-        self.disconnect_message = disconnect_message
         # Server IP
         self.server_address = socket.gethostbyname(socket.gethostname())
         # Socket object
@@ -199,5 +194,3 @@ class Server:
 if __name__ == "__main__":
     server = Server(64, 5050, "utf-8", "!DISCONNECT", RSA())
     server.open()
-
-"cd c:/microsoft vs code/seng2250/seng2250/a3"

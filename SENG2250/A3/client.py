@@ -10,17 +10,13 @@ from utils.dhe import DiffieHellman
 class Client:
     def __init__(
         self,
-        header: int,
         port: int,
         format: str,
-        disconnect_message: str,
         server_address: str,
         id=secrets.token_hex(16),
     ):
-        self.header = header
         self.port = port
         self.format = format
-        self.disconnect_message = disconnect_message
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.server_address = server_address
         self.id = id
@@ -120,9 +116,6 @@ class Client:
         k_prime = k_prime[:24]
 
         self.msg_exhange(k_prime, client_message, sessionID)
-
-        # Send disconnection message
-        self.client.send(self.disconnect_message.encode(self.format))
 
     def msg_exhange(self, k_prime, client_message, sessionID):
         print("k_prime_len: ", len(k_prime))
