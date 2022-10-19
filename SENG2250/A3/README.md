@@ -4,12 +4,12 @@ Author:         Johanne Montano
 Student Number: C3336019
 
 Dependencies required:
-    hashlib
+    hashlib         (SHA256)
     socket
-    secrets
-    sys
-    pycryptodome
-    random
+    secrets         (random ID generators, mostly in hex)
+    sys             (Force exiting the script if any of the signatures do not match)
+    pycryptodome    (Needed for AES)
+    random          (Needed for random bits)
 
 As far as I am aware these libraries are all built in (except for pycryptodome) but if the interpreter throws an unknown module error, please try
 
