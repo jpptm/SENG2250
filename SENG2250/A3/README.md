@@ -19,7 +19,7 @@ These scripts have been tested over and over again so the output should be visib
 
 The main scripts are 'server.py' and 'client.py'
 
-Please open 2 instances of your terminal. After receiving the zip file and extracting, cd A3 (I do not know what the equivalent of cd is in macOS) and enter
+Please open 2 instances of your terminal. After receiving the zip file and extracting, cd A3 (I do not know what the equivalent of cd is in macOS, sincerest apologies) and enter
 
 'python server.py' in one instance and 'python client.py' at the other. In pc's with Ubuntu/Debian/Linux based, the command might have to be
 
