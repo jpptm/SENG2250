@@ -1,0 +1,64 @@
+---- ---- Q2 ---- ----
+Suppose that a language “X” has 28 different letters. Answer the following questions.
+
+a. Alice wants to use a 10-letter password (case insensitive). Each password character is 
+randomly  selected  from  28  possible  letters.  How  many  different  passwords  can  be  
+generated?        (5 marks) 
+
+
+- There are 10 spots to fill, and each spot is equally likely to have any letter as repetitions are allowed
+- Each spot has a searching space of 28 characters only as the password is case insensitive
+- This means that each spot has 28 possible choices
+- So the total searching space, i.e., the different passwords that can be generated is 28^10 which is equal to 296 196 766 695 424
+
+
+b. Suppose that an adversary can attempt passwords at a rate of four million per second. 
+If an adversary can immediately know an attempted password’s correctness, what is 
+the  expected  time (i.e., average time) to  reveal  Alice’s  password  generated  above? 
+Convert the time to the number of seconds.    (8 marks) 
+
+- The average attempts E(a) is equal to (bestNumberOfAttempts + worstNumberOfAttempts) / 2
+- The best number of attempts would be if the adversary got the password in the first try, i.e., 1 attempt
+- The worst case would be to search through all of the possible passwords in the search space equal to the answer in a)
+- Thus E(a) = (28^10 + 1) / 2 = 148098383347712.5
+- The expected time E(t) will be equal to E(a) / 4e6 , 4e6 being the average number of passwords the adversary can attempt per second
+- The result will be 37024595.83692812 seconds, the average time that will take to reveal Alice's password.
+
+
+c. Suppose that Bob uses a monoalphabetic substitution cipher (regarding the language 
+“X”) to encrypt a message.  Assume the redundancy of the plaintext “X” is 4.5. How 
+many ciphertext characters are needed to identify a unique key?  (12 marks)
+
+- The unicity distance formula will be used to solve this problem.
+- N = log_2(E) / d
+- Alphabet "X" has 28 characters, and plaintext "X" has a redundancy of d = 4.5
+- Take E to be 28! as each key is chosen with uniform probability
+- Thus, N = log_2(28!) / 4.5 = 21.7653768336083
+- This implies that at least 22 characters (rounded N to the nearest integer) are needed to determine the unique key.
+
+---- ---- Q4 ---- ----
+4. Hash Functions (20 marks)
+
+a. Let ℎ be a secure one-way hash function. Given a set {𝑣1, 𝑣2, 𝑣3, 𝑣4, 𝑣5}, such that 
+𝑣1  = ℎ(𝑥);   𝑣2  = ℎ(𝑣1);   𝑣3  = ℎ(𝑣2);   𝑣4  = ℎ(𝑣3);   𝑣5  = ℎ(𝑣4). 
+Suppose 𝑣3 is  known,  can  we  compute  any  of  the  others  in {𝑣1, 𝑣2, 𝑣4, 𝑣5}?  If  yes,  
+show how; otherwise, explain why.      (10 marks) 
+ 
+- Leading from the fact that h is a given and known secure cryptographic hash function, v4 and v5 can be obtained as h(v3) = v4 and similarly, h(v4) = v5 = h(h(v3)) i.e., hashing v3 to get v4 and then hashing v4 to get v5
+- On the other hand, because h is cryptographically secure this must imply that it is unfeasible to invert the output hash back to input data like v_(i-1) = arch(v_i) i.e., one cannot "invert hash" v3 to get back to v2 as the function h is essentially irreversible
+- Similarly, one cannot "invert hash" v3 twice to get to v1. Therefore, it is trivial to get to v4 and v5 but not back to v2 and v1.
+- In addition, h would also have second pre imaging resistance where one cannot find another value m1 apart from m0 such that h(m0) = h(m1) 
+
+b. Let (𝑒, 𝑛) be  an  RSA  public  key,  and  (𝑝, 𝑞, 𝑑) be  the  corresponding  private  key.  The  
+public key (𝑒, 𝑛) is known to everyone, but NO ONE knows the private key (𝑝, 𝑞, 𝑑). 
+
+Consider a message 𝑚
+1) If 0 < 𝑚< 𝑛, can we use the RSA encryption algorithm as a one-way hash 
+function? Justify your answer      (5 marks) 
+
+
+
+
+
+2) If 𝑚> 𝑛, can we use the RSA encryption algorithm as a cryptographic hash 
+function? Justify your answer.    

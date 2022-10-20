@@ -1,0 +1,80 @@
+Plaintext (512 bits): 4629f44bb74c0d3b6fd00d10a2e41238e762638f323c700d82b7920df6b928282ddc91c5e863e35979c6d3704feb26265c897b6d8a6aebe51bd3eb66ad2ea5f8
+Key (256 bits): C3336019ACC915427A9D2A21002F4769743B81CDA26FD4ED79BE57BD22899AE7
+IV: A011EC7A06FF0780CDADB2A634EBA39C
+
+Blocks
+['4629f44bb74c0d3b6fd00d10a2e41238', 'e762638f323c700d82b7920df6b92828', '2ddc91c5e863e35979c6d3704feb2626', '5c897b6d8a6aebe51bd3eb66ad2ea5f8']
+
+No Nonce changes
+Round 1
+    Input of AES: 4629f44bb74c0d3b6fd00d10a2e41238
+    Output of AES: 31ace51f1a9203a1ce0ccf1adcec5bc7
+
+Round 2
+    Input of AES: e762638f323c700d82b7920df6b92828
+    Output of AES: 90e772db9fe27e97236b500788b161d7
+
+Round 3
+    Input of AES: 2ddc91c5e863e35979c6d3704feb2626
+    Output of AES: 5a59809145bdedc3d81a117a31e36fd9
+
+Round 4
+    Input of AES: 5c897b6d8a6aebe51bd3eb66ad2ea5f8
+    Output of AES: 2b0c6a3927b4e57fba0f296cd326ec07
+
+Entire ciphertext: 31ace51f1a9203a1ce0ccf1adcec5bc790e772db9fe27e97236b500788b161d75a59809145bdedc3d81a117a31e36fd92b0c6a3927b4e57fba0f296cd326ec07
+
+With Nonce changes (Shift the last 4 characters to their successors)
+Round 1: 
+    Input of AES: 4629f44bb74c0d3b6fd00d10a2e41238
+    IV: A011EC7A06FF0780CDADB2A634EBA39C
+    Output of AES: 31ace51f1a9203a1ce0ccf1adcec5bc7
+
+Round 2
+    Input of AES: e762638f323c700d82b7920df6b92828
+    IV: A011EC7A06FF0780CDADB2A634EBB40D
+    Output of AES: cb2f22a34e32f80e986db90276b33a47
+
+Round 3
+    Input of AES: 2ddc91c5e863e35979c6d3704feb2626
+    IV: A011EC7A06FF0780CDADB2A634EBC51E
+    Output of AES: 26eb93f8f2e6a18fa38f4a651020dc48
+
+Round 4
+    Input of AES: 5c897b6d8a6aebe51bd3eb66ad2ea5f8
+    IV: A011EC7A06FF0780CDADB2A634EBD62F
+    Output of AES: 39df13dc56226358e1a5e5c3c102cc97
+
+Entire ciphertext: 31ace51f1a9203a1ce0ccf1adcec5bc7cb2f22a34e32f80e986db90276b33a4726eb93f8f2e6a18fa38f4a651020dc4839df13dc56226358e1a5e5c3c102cc97
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+THE CORRECT METHOD LIES BELOW
+
+Plaintext (512 bits): 4629f44bb74c0d3b6fd00d10a2e41238e762638f323c700d82b7920df6b928282ddc91c5e863e35979c6d3704feb26265c897b6d8a6aebe51bd3eb66ad2ea5f8
+Key (256 bits): C3336019ACC915427A9D2A21002F4769743B81CDA26FD4ED79BE57BD22899AE7
+IV: A011EC7A06FF0780CDADB2A634EBA39C
+
+Blocks
+['4629f44bb74c0d3b6fd00d10a2e41238', 'e762638f323c700d82b7920df6b92828', '2ddc91c5e863e35979c6d3704feb2626', '5c897b6d8a6aebe51bd3eb66ad2ea5f8']
+
+Round 1:
+    Input of AES: A011EC7A06FF0780CDADB2A634EBA39C
+    Output of AES (of Key and IV): 77851154adde0e9aa1dcc20a7e0849ff
+    XOR of Block 1 and Output: 31ace51f1a9203a1ce0ccf1adcec5bc7 - This is ciphertext 1
+
+Round 2:
+    Input of AES: A011EC7A06FF0780CDADB2A634EBA39D (shift the last char to its successor)
+    Output of AES (of Key and IV): 0aa6d0a8207765f1de1259a6ed66c802
+    XOR of Block 2 and Output: edc4b327124b15fc5ca5cbab1bdfe02a
+
+Round 3: 
+    Input of AES: A011EC7A06FF0780CDADB2A634EBA39E
+    Output of AES (of Key and IV): adcd1feaaf85be8709bea978c9f45c7d
+    XOR of Block 3 and Output: 80118e2f47e65dde70787a08861f7a5b
+
+Round 4:
+    Input of AES: A011EC7A06FF0780CDADB2A634EBA39F
+    Output of AES (of Key and IV): 36b97be651abb163d396b7bff9aeaa90
+    XOR of Block 4 and Output: 6a30008bdbc15a86c8455cd954800f68
+
+Entire Ciphertext: 31ace51f1a9203a1ce0ccf1adcec5bc7 edc4b327124b15fc5ca5cbab1bdfe02a 80118e2f47e65dde70787a08861f7a5b 6a30008bdbc15a86c8455cd954800f68
