@@ -233,7 +233,3 @@ class Server:
 if __name__ == "__main__":
     server = Server(5050, "utf-8", RSA())
     server.open()
-
-
-# RSA SIGNATURE GENERATION: MAYBE USE SESSION KEY TO ENCRYPT MSG INSTEAD?
-# MAYBE ENCRYPT MESSAGE WITH SESSION KEY
