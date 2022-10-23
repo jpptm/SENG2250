@@ -2,6 +2,7 @@
 import hashlib
 import secrets
 import socket
+import sys
 
 from utils import cbc
 from utils.dhe import DiffieHellman
@@ -86,12 +87,51 @@ class Server:
 
             # Generate server's public key and send it to the client
             ya = dh.calculate_pubkey(xa)
-            client_socket.send(str(xa).encode(self.format))
-            xb = client_socket.recv(4096).decode(self.format)
+
+            # Sign ya with server's private key to avoid MITM
+            ya_signature = self.rsa.decrypt(ya)
+            ya_and_signature = f"{ya}/{ya_signature}"
+            client_socket.send(ya_and_signature.encode(self.format))
+
+            # Receive client's public key
+            yb = client_socket.recv(4096).decode(self.format)
 
             # Calculate the shared secret key
-            Kba = dh.calculate_shared_secret(ya, int(xb))
-            # print("Server: shared secret key is ", Kba, "\n")
+            Kba = dh.calculate_shared_secret(int(yb), xa)
+
+            # If the client returns the correct hash value for the challenge encrypted by the shared key then the client is authenticated
+            # After calculating shared secret, the shared key must be checked via challenge protocol.
+            # The server will be sending a challenge to the client
+            server_challenge = secrets.token_hex(32)
+            padding = secrets.token_hex(32)
+            server_challenge_nonce = secrets.token_hex(32)
+
+            challenge_key = hashlib.sha256(Kba.to_bytes(1024, "big")).digest()[:24]
+            encrypted_server_challenge = cbc.encrypt(
+                server_challenge + padding + server_challenge_nonce,
+                challenge_key,
+                server_challenge_nonce,
+            )
+            server_nonce_and_challenge = (
+                f"{server_challenge_nonce}/{encrypted_server_challenge}"
+            )
+            client_socket.send(server_nonce_and_challenge.encode(self.format))
+
+            # Receive client's response and check if the hashes match, if not force exit the program
+            hashed_server_challenge = client_socket.recv(4096).decode(self.format)
+
+            if (
+                hashed_server_challenge
+                == hashlib.sha256(
+                    (server_challenge + padding + server_challenge_nonce).encode(
+                        self.format
+                    )
+                ).hexdigest()
+            ):
+                print("Server: Challenge successful", "\n")
+            else:
+                print("Server: Challenge failed", "\n")
+                sys.exit()
 
             # === === === C B C - H M A C - T E S T === === === #
 
@@ -187,9 +227,13 @@ class Server:
             print("Server: Client message is authentic", "\n")
         else:
             print("Server: Client message is not authentic", "\n")
-            return
+            sys.exit()
 
 
 if __name__ == "__main__":
     server = Server(5050, "utf-8", RSA())
     server.open()
+
+
+# RSA SIGNATURE GENERATION: MAYBE USE SESSION KEY TO ENCRYPT MSG INSTEAD?
+# MAYBE ENCRYPT MESSAGE WITH SESSION KEY

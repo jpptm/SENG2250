@@ -34,6 +34,8 @@ If this happens, please exit the current terminal instances then start 2 new one
 For context, I was playing around with true random numbers and found secrets. I just found it interesting that they use a true random number generator by using file entropy via 'secrets.SystemRandom()'.
 It is also very convenient that they can generate tokens, random hex values and random bits/bytes.
 
+It is highly recommended to use vs code or any IDE that lets the user split the showing of the scripts from left to right to allow for an easier code review.
+
 If there are any further questions/clarifications that the markers would like to ask please do not hesitate to let me know and contact me at either johanne.montano@uon.edu.au or prncmontano@gmail.com, whichever is more preferable.
 
 Thank you very much in advance!

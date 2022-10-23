@@ -1,5 +1,6 @@
 # This script will serve as a module for all utilities needed by the client-server handshake
-from random import randrange, getrandbits
+# from random import randrange, getrandbits
+from Crypto.Random.random import getrandbits, randrange
 
 # pip install pycryptodome
 # One must avoid having both PyCrypto and PyCryptodome installed at the same time, as they will interfere with each other.

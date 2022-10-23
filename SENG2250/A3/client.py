@@ -62,10 +62,10 @@ class Client:
 
         # Confirm signature integrity
         if hashed_rawmsg == hexmsg:
-            print("Signature verified", "\n")
+            print("RSA signature verified", "\n")
         # Force close connection if the RSA signature is not the same as the msg
         else:
-            print("Signature not verified, connection not secure", "\n")
+            print("RSA signature not verified, connection not secure", "\n")
             sys.exit()
 
         # Initialise Diffie-Hellman key exchange if the signatures match
@@ -77,14 +77,43 @@ class Client:
         true_rng = secrets.SystemRandom()
         xb = true_rng.randint(2, dh.p - 1)
 
-        # Receive server public key and generate client's public key
+        # Generate client's public key
         yb = dh.calculate_pubkey(xb)
-        xa = self.client.recv(4096).decode(self.format)
-        self.client.send(str(xb).encode(self.format))
+
+        # Receive server's public key and check the signature. If the signature is not verified, close the connection
+        ya_and_signature = self.client.recv(4096).decode(self.format)
+        ya, ya_signature = ya_and_signature.split("/")
+
+        # Unpack the signature and confirm if the integrity of the message is still intact
+        if util.fast_mod_exp(int(ya_signature), e, n) == int(ya):
+            print("DH public key signature verified", "\n")
+        else:
+            print("DHK signature not verified, connection not secure", "\n")
+            sys.exit()
+
+        # If the signatures match, send client's public key if signature is legit
+        self.client.send(str(yb).encode(self.format))
 
         # Calculate shared secret key
-        Kab = dh.calculate_shared_secret(yb, int(xa))
-        # print(f"Shared secret key: {Kab}", "\n") # Uncomment if the user wishes to see the shared secret key
+        Kab = dh.calculate_shared_secret(int(ya), xb)
+
+        # Accept challenge from server
+        server_challenge_nonce, encrypted_server_challenge = (
+            self.client.recv(4096).decode(self.format).split("/")
+        )
+
+        # Decrypt the challenge and send answer to server
+        challenge_key = hashlib.sha256(Kab.to_bytes(1024, "big")).digest()[:24]
+        decrypted_server_challenge = cbc.decrypt(
+            encrypted_server_challenge, challenge_key, server_challenge_nonce
+        )
+
+        hashed_server_challenge = hashlib.sha256(
+            decrypted_server_challenge.encode(self.format)
+        ).hexdigest()
+        self.client.send(hashed_server_challenge.encode(self.format))
+
+        # The program will go through if the challenge was successfully answered
 
         # === === === C B C - H M A C - T E S T === === === #
 
@@ -179,7 +208,6 @@ class Client:
         else:
             print("Client: Server message is not authentic", "\n")
             sys.exit()
-        pass
 
 
 if __name__ == "__main__":
