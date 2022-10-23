@@ -106,7 +106,7 @@ class Server:
             padding = secrets.token_hex(32)
             server_challenge_nonce = secrets.token_hex(32)
 
-            challenge_key = hashlib.sha256(Kba.to_bytes(1024, "big")).digest()[:24]
+            challenge_key = hashlib.sha256(Kba.to_bytes(1024, "big")).digest()
             encrypted_server_challenge = cbc.encrypt(
                 server_challenge + padding + server_challenge_nonce,
                 challenge_key,

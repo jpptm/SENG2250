@@ -103,7 +103,7 @@ class Client:
         )
 
         # Decrypt the challenge and send answer to server
-        challenge_key = hashlib.sha256(Kab.to_bytes(1024, "big")).digest()[:24]
+        challenge_key = hashlib.sha256(Kab.to_bytes(1024, "big")).digest()
         decrypted_server_challenge = cbc.decrypt(
             encrypted_server_challenge, challenge_key, server_challenge_nonce
         )
